@@ -4,47 +4,63 @@ import { dbConnect } from "@/lib/db";
 import Patient from "@/models/Patient";
 import { getDoctorIdFromRequest } from "@/lib/auth";
 
-interface Params {
-  params: { id: string };
-}
-
-export async function GET(req: NextRequest, { params }: Params) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   await dbConnect();
   const doctorId = getDoctorIdFromRequest(req);
   if (!doctorId) return NextResponse.json({ success: false }, { status: 401 });
 
-  const patient = await Patient.findOne({ _id: params.id, doctor: doctorId });
-  if (!patient) return NextResponse.json({ success: false, message: "Not found" }, { status: 404 });
+  const { id } = context.params;
+
+  const patient = await Patient.findOne({ _id: id, doctor: doctorId });
+  if (!patient)
+    return NextResponse.json(
+      { success: false, message: "Not found" },
+      { status: 404 }
+    );
 
   return NextResponse.json({ success: true, patient });
 }
 
-export async function PUT(req: NextRequest, { params }: Params) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   await dbConnect();
   const doctorId = getDoctorIdFromRequest(req);
   if (!doctorId) return NextResponse.json({ success: false }, { status: 401 });
 
+  const { id } = context.params;
   const body = await req.json();
 
   const patient = await Patient.findOneAndUpdate(
-    { _id: params.id, doctor: doctorId },
+    { _id: id, doctor: doctorId },
     body,
     { new: true }
   );
 
-  if (!patient) {
-    return NextResponse.json({ success: false, message: "Not found" }, { status: 404 });
-  }
+  if (!patient)
+    return NextResponse.json(
+      { success: false, message: "Not found" },
+      { status: 404 }
+    );
 
   return NextResponse.json({ success: true, patient });
 }
 
-export async function DELETE(req: NextRequest, { params }: Params) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   await dbConnect();
   const doctorId = getDoctorIdFromRequest(req);
   if (!doctorId) return NextResponse.json({ success: false }, { status: 401 });
 
-  await Patient.findOneAndDelete({ _id: params.id, doctor: doctorId });
+  const { id } = context.params;
+
+  await Patient.findOneAndDelete({ _id: id, doctor: doctorId });
 
   return NextResponse.json({ success: true });
 }
