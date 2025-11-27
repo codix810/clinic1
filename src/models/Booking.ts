@@ -1,16 +1,15 @@
-// models/Booking.ts
 import { Schema, models, model, Document } from "mongoose";
 
 export interface IBooking extends Document {
-  doctor: string;
-  patient?: string; // ref Patient (اختياري لو من بره)
+  doctor: any;
+  patient?: any;
   name: string;
   phone: string;
   place: "online" | "offline";
   branch?: "cairo" | "alex" | "online";
-  date: string; // "2025-01-01"
-  time: string; // "09:00 ص"
-  type: string; // متابعة / استشارة / فحص دوري
+  date: string;
+  time: string;
+  type: string;
   notes?: string;
   status: "pending" | "confirmed" | "rejected";
   createdAt: Date;
