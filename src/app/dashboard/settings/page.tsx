@@ -125,12 +125,13 @@ const res = await fetch("/api/settings", {
     setHours({ ...hours, [day]: updated });
   };
 
-  const deleteHour = (day: string, index: number) => {
-    if (!confirm("هل أنت متأكد؟")) return;
+const deleteHour = (day: string, index: number) => {
+  if (!confirm("هل أنت متأكد من الحذف؟")) return;
 
-    const updated = hours[day].filter((_, i) => i !== index);
-    setHours({ ...hours, [day]: updated });
-  };
+const updated = hours[day].filter((slot: { from: string; to: string }, i: number) => i !== index);
+  setHours({ ...hours, [day]: updated });
+};
+;
 
   if (loading) return <p className="text-center mt-10">جارٍ التحميل...</p>;
 
