@@ -1,13 +1,15 @@
+//api/patients/new
+
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/db";
 import Patient from "@/models/Patient";
-import { getDoctorIdFromRequest } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
-    const doctorId = getDoctorIdFromRequest(req);
+    const doctorId = getUserIdFromRequest(req);
     if (!doctorId) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },

@@ -1,8 +1,6 @@
-// app/booking/page.tsx
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // أيام الأسبوع
 const dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
@@ -43,18 +41,21 @@ export default function Booking() {
   const [phone, setPhone] = useState("");
   const [fee, setFee] = useState("");
   const [notes, setNotes] = useState("");
-   const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
-  // calendar states
+  // preview image
+  const [preview, setPreview] = useState<string | null>(null);
+
+  // calendar state
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
   const [selectedDate, setSelectedDate] = useState<any>(null);
   const [selectedTime, setSelectedTime] = useState<any>(null);
 
-  // generate calendar days
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+  // get day object
   const getDayObj = (day: number) => {
     const d = new Date(year, month, day);
     return {
@@ -62,63 +63,64 @@ export default function Booking() {
       dayName: dayNames[d.getDay()],
       dateStr: d.toISOString().slice(0, 10),
       disabled:
-        d < new Date(today.toDateString()) || d.getDay() === 5, // الجمعة عطلة
+        d < new Date(today.toDateString()) || d.getDay() === 5,
     };
   };
 
-const handleSubmit = async () => {
-  if (!consultType) return alert("اختر نوع الاستشارة");
-  if (!place) return alert("اختر مكان الاستشارة");
-  if (!name.trim()) return alert("ادخل اسم المريض");
-  if (!phone.trim()) return alert("ادخل رقم الهاتف");
-  if (place === "online" && (!fee || Number(fee) <= 0))
-    return alert("ادخل مبلغ الحجز");
-  if (!selectedDate) return alert("اختر التاريخ");
-  if (!selectedTime) return alert("اختر الوقت");
+  // submit
+  const handleSubmit = async () => {
+    if (!consultType) return alert("اختر نوع الاستشارة");
+    if (!place) return alert("اختر مكان الاستشارة");
+    if (!name.trim()) return alert("ادخل اسم المريض");
+    if (!phone.trim()) return alert("ادخل رقم الهاتف");
+    if (place === "online" && (!fee || Number(fee) <= 0))
+      return alert("ادخل مبلغ الحجز");
+    if (!selectedDate) return alert("اختر التاريخ");
+    if (!selectedTime) return alert("اختر الوقت");
 
-  try {
-    const formData = new FormData();
-    formData.append("consultType", consultType);
-    formData.append("place", place);
-    formData.append("branch", branch);
-    formData.append("name", name);
-    formData.append("phone", phone);
-    formData.append("date", selectedDate);
-    formData.append("time", selectedTime);
-    if (fee) formData.append("fee", fee);
-    if (notes) formData.append("notes", notes);
-    if (file) formData.append("file", file);
+    try {
+      const formData = new FormData();
+      formData.append("consultType", consultType);
+      formData.append("place", place);
+      formData.append("branch", branch);
+      formData.append("name", name);
+      formData.append("phone", phone);
+      formData.append("date", selectedDate);
+      formData.append("time", selectedTime);
+      if (fee) formData.append("fee", fee);
+      if (notes) formData.append("notes", notes);
+      if (file) formData.append("file", file);
 
-    const res = await fetch("/api/bookings", {
-      method: "POST",
-      body: formData,
-    });
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok || !data.success) {
-      console.error(data);
-      return alert(data.message || "حدث خطأ أثناء الحجز");
+      if (!res.ok || !data.success) {
+        return alert(data.message || "حدث خطأ أثناء الحجز");
+      }
+
+      alert("تم تسجيل الحجز بنجاح");
+
+      // reset
+      setConsultType("");
+      setPlace("");
+      setBranch("cairo");
+      setName("");
+      setPhone("");
+      setFee("");
+      setNotes("");
+      setFile(null);
+      setPreview(null);
+      setSelectedDate(null);
+      setSelectedTime(null);
+    } catch (err) {
+      console.error(err);
+      alert("خطأ في السيرفر");
     }
-
-    alert("تم تسجيل الحجز بنجاح ✅");
-
-    // reset بسيط
-    setConsultType("");
-    setPlace("");
-    setBranch("cairo");
-    setName("");
-    setPhone("");
-    setFee("");
-    setNotes("");
-    setFile(null);
-    setSelectedDate(null);
-    setSelectedTime(null);
-  } catch (err) {
-    console.error(err);
-    alert("خطأ في السيرفر");
-  }
-};
+  };
 
   return (
     <div className="max-w-[1100px] mx-auto p-4">
@@ -129,8 +131,8 @@ const handleSubmit = async () => {
         <p className="text-gray-500 mt-2">يرجى ملء البيانات التالية</p>
       </div>
 
-      {/* Form */}
       <div className="mt-10 space-y-6">
+
         {/* نوع الاستشارة */}
         <div>
           <label className="font-semibold">نوع الاستشارة *</label>
@@ -228,7 +230,7 @@ const handleSubmit = async () => {
           </div>
         )}
 
-        {/* الملاحظات */}
+        {/* ملاحظات */}
         {place && (
           <div>
             <label className="font-semibold">ملاحظات للطبيب</label>
@@ -240,23 +242,41 @@ const handleSubmit = async () => {
           </div>
         )}
 
-        {/* Upload */}
+        {/* رفع صورة الدفع */}
         {place === "online" && (
           <div>
-            <label className="font-semibold">
-              رفع سكرين شوت التحويل *
-            </label>
+            <label className="font-semibold">رفع سكرين شوت التحويل *</label>
 
-            <div className="border-dashed border-2 p-10 text-center rounded-xl mt-3 cursor-pointer hover:bg-blue-50"
+            <div
+              className="border-dashed border-2 p-10 text-center rounded-xl mt-3 cursor-pointer hover:bg-blue-50"
               onClick={() => document.getElementById("fileUpload")?.click()}
             >
               <i className="fa-solid fa-arrow-up text-4xl text-teal-600"></i>
-              <p className="text-gray-600 mt-2">اضغط لرفع الملف</p>
+              <p className="text-gray-600 mt-2">اضغط لرفع ملف الدفع</p>
+
+              {file && (
+                <p className="text-green-600 mt-3 font-semibold">
+                  {file.name}
+                </p>
+              )}
+
+              {preview && (
+                <img
+                  src={preview}
+                  className="w-40 mx-auto mt-4 rounded-xl shadow"
+                />
+              )}
+
               <input
                 id="fileUpload"
                 type="file"
+                accept="image/*"
                 className="hidden"
-                onChange={(e: any) => setFile(e.target.files[0])}
+                onChange={(e: any) => {
+                  const f = e.target.files[0];
+                  setFile(f);
+                  setPreview(URL.createObjectURL(f));
+                }}
               />
             </div>
           </div>
@@ -268,7 +288,7 @@ const handleSubmit = async () => {
             <label className="font-semibold">اختيار التاريخ *</label>
 
             <div className="bg-white p-4 rounded-xl border mt-3">
-              {/* Header */}
+              {/* Calendar Header */}
               <div className="flex justify-between items-center mb-4">
                 <button
                   className="p-2 bg-teal-600 text-white rounded-lg"
@@ -293,13 +313,10 @@ const handleSubmit = async () => {
               <div className="grid grid-cols-7 gap-3 text-center">
                 {[...Array(daysInMonth)].map((_, i) => {
                   const d = getDayObj(i + 1);
-
                   return (
                     <div
                       key={i}
-                      onClick={() =>
-                        !d.disabled && setSelectedDate(d.dateStr)
-                      }
+                      onClick={() => !d.disabled && setSelectedDate(d.dateStr)}
                       className={`p-3 rounded-xl cursor-pointer ${
                         d.disabled
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -310,9 +327,7 @@ const handleSubmit = async () => {
                           : ""
                       }`}
                     >
-                      <div className="text-sm text-gray-500">
-                        {d.dayName}
-                      </div>
+                      <div className="text-sm text-gray-500">{d.dayName}</div>
                       <div className="text-lg font-bold">{d.dayNumber}</div>
                     </div>
                   );
@@ -328,27 +343,26 @@ const handleSubmit = async () => {
             <label className="font-semibold">اختيار الوقت *</label>
 
             <div className="mt-3 grid md:grid-cols-3 gap-4">
-              {(place === "online"
-                ? onlineTimes
-                : branchTimes[branch]
-              ).map((time: string, i: number) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedTime(time)}
-                  className={`p-3 rounded-xl border text-center ${
-                    selectedTime === time
-                      ? "border-teal-600 bg-teal-100"
-                      : "border-gray-300 hover:bg-teal-50"
-                  }`}
-                >
-                  {time}
-                </button>
-              ))}
+              {(place === "online" ? onlineTimes : branchTimes[branch]).map(
+                (time: string, i: number) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedTime(time)}
+                    className={`p-3 rounded-xl border text-center ${
+                      selectedTime === time
+                        ? "border-teal-600 bg-teal-100"
+                        : "border-gray-300 hover:bg-teal-50"
+                    }`}
+                  >
+                    {time}
+                  </button>
+                )
+              )}
             </div>
           </div>
         )}
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           onClick={handleSubmit}
           className="w-full p-4 bg-green-600 text-white font-bold rounded-xl mt-10 hover:bg-green-700"

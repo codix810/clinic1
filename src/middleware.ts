@@ -13,6 +13,8 @@ export function middleware(req: NextRequest) {
     "/api/bookings",
     "/api/bookings/",
     "/api/bookings/create",
+    "/api/patients",      // ← أضفناها
+    "/api/patients/",     // ← وأضفنا النسخة بالسلاش
     "/api/patients/public",
     "/api/booking",
     "/api/booking/",
@@ -50,7 +52,6 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// Apply only to /api
 export const config = {
   matcher: ["/api/:path*"],
 };

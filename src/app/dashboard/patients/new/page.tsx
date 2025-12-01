@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function AddPatient() {
   const [form, setForm] = useState({
-    name: "",
+    fullName: "",
     phone: "",
     dob: "",
     gender: "",
@@ -12,73 +12,82 @@ export default function AddPatient() {
     notes: "",
   });
 
-const handleSubmit = async (e: any) => {
-  e.preventDefault();
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
 
-  const res = await fetch("/api/patients", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form),
-  });
+    const token = localStorage.getItem("token");
+    if (!token) return alert("يجب تسجيل الدخول");
 
-  const data = await res.json();
+    const res = await fetch("/api/patients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(form),
+    });
 
-  if (data.success) {
-    alert("تم تسجيل المريض");
-  } else {
-    alert("Error");
-  }
-};
-
+    const data = await res.json();
+    if (data.success) {
+      alert("تم إضافة المريض");
+      window.location.href = "/dashboard/patients";
+    } else {
+      alert("خطأ — راجع الكونسل");
+      console.log(data);
+    }
+  };
 
   return (
     <div className="p-10 space-y-4">
       <h1 className="text-2xl font-bold">إضافة مريض جديد</h1>
 
-      <input
-        placeholder="اسم المريض"
-        className="border p-3 rounded w-full"
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
-      />
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <input
+          placeholder="اسم المريض"
+          className="border p-3 rounded w-full"
+          onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+        />
 
-      <input
-        placeholder="رقم الهاتف"
-        className="border p-3 rounded w-full"
-        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-      />
+        <input
+          placeholder="رقم الهاتف"
+          className="border p-3 rounded w-full"
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+        />
 
-      <input
-        type="date"
-        className="border p-3 rounded w-full"
-        onChange={(e) => setForm({ ...form, dob: e.target.value })}
-      />
+        <input
+          type="date"
+          className="border p-3 rounded w-full"
+          onChange={(e) => setForm({ ...form, dob: e.target.value })}
+        />
 
-      <select
-        className="border p-3 rounded w-full"
-        onChange={(e) => setForm({ ...form, gender: e.target.value })}
-      >
-        <option>ذكر</option>
-        <option>أنثى</option>
-      </select>
+        <select
+          className="border p-3 rounded w-full"
+          onChange={(e) => setForm({ ...form, gender: e.target.value })}
+        >
+          <option value="">اختر النوع</option>
+          <option value="ذكر">ذكر</option>
+          <option value="أنثى">أنثى</option>
+        </select>
 
-      <input
-        placeholder="العنوان"
-        className="border p-3 rounded w-full"
-        onChange={(e) => setForm({ ...form, address: e.target.value })}
-      />
+        <input
+          placeholder="العنوان"
+          className="border p-3 rounded w-full"
+          onChange={(e) => setForm({ ...form, address: e.target.value })}
+        />
 
-      <textarea
-        placeholder="ملاحظات"
-        className="border p-3 rounded w-full"
-        onChange={(e) => setForm({ ...form, notes: e.target.value })}
-      />
+        <textarea
+          placeholder="ملاحظات"
+          className="border p-3 rounded w-full"
+          onChange={(e) => setForm({ ...form, notes: e.target.value })}
+        />
 
-      <button
-        onClick={handleSubmit}
-        className="bg-teal-600 text-white px-6 py-3 rounded-lg"
-      >
-        إضافة المريض
-      </button>
+        <button
+          type="submit"
+          className="bg-teal-600 text-white px-6 py-3 rounded-lg"
+        >
+          إضافة المريض
+        </button>
+      </form>
     </div>
   );
 }

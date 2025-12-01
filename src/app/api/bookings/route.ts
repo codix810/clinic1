@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/db";
-import Booking from "@/models/Booking"; // ← لاحظ: Booking الرئيسي
+import Booking from "@/models/Booking";
 import cloudinary from "@/lib/cloudinary";
 
 export const runtime = "nodejs";
@@ -19,14 +19,14 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
 
-    const name = String(formData.get("name") || "").trim();
-    const phone = String(formData.get("phone") || "").trim();
-    const consultType = String(formData.get("consultType") || "");
-    const place = String(formData.get("place") || "");
-    const branch = String(formData.get("branch") || "");
-    const date = String(formData.get("date") || "");
-    const time = String(formData.get("time") || "");
-    const notes = String(formData.get("notes") || "");
+    const name = (formData.get("name") || "").toString().trim();
+    const phone = (formData.get("phone") || "").toString().trim();
+    const consultType = (formData.get("consultType") || "").toString();
+    const place = (formData.get("place") || "").toString();
+    const branch = (formData.get("branch") || "").toString();
+    const date = (formData.get("date") || "").toString();
+    const time = (formData.get("time") || "").toString();
+    const notes = (formData.get("notes") || "").toString();
     const feeRaw = formData.get("fee");
     const file = formData.get("file") as File | null;
 
@@ -39,56 +39,48 @@ export async function POST(req: NextRequest) {
 
     let transferImageUrl: string | undefined;
 
+    // ✅ رفع الصورة لو موجودة
     if (file && file.size > 0) {
-      const buf = Buffer.from(await file.arrayBuffer());
+      const buffer = Buffer.from(await file.arrayBuffer());
 
-      const uploadResult = await new Promise<{ secure_url: string }>(
-        (resolve, reject) => {
-          cloudinary.uploader.upload_stream(
-            { folder: "bookings" },
-            (err, result) => {
-              if (err || !result) return reject(err);
-              resolve(result as any);
-            }
-          ).end(buf);
-        }
-      );
+      const uploaded = await new Promise<{ secure_url: string }>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: "clinic-bookings" },
+          (err, result) => {
+            if (err || !result) return reject(err);
+            resolve(result as any);
+          }
+        ).end(buffer);
+      });
 
-      transferImageUrl = uploadResult.secure_url;
+      transferImageUrl = uploaded.secure_url;
     }
 
-    const fee =
-      typeof feeRaw === "string" && feeRaw.trim() !== ""
-        ? Number(feeRaw)
-        : undefined;
+    const fee = typeof feeRaw === "string" ? Number(feeRaw) : undefined;
 
-    // لو عندك دكتور واحد ثابت
-    const doctorId = "66f123abc9ff3c28b652de01"; // ← حط ID الدكتور هنا
+    const doctorId = "66f123abc9ff3c28b652de01";
 
     const booking = await Booking.create({
       doctor: doctorId,
       name,
       phone,
-      type: consultType, // ← خلي نوع الاستشارة يروح للداشبورد
+      type: consultType,
       place,
       branch,
       date,
       time,
       notes,
       fee,
-      transferImageUrl,
-      status: "pending", // ← دي المهم
+      transferImageUrl, // ← أهم حاجة
+      status: "pending",
     });
 
     return NextResponse.json({ success: true, data: booking }, { status: 201 });
+
   } catch (err: any) {
-    console.error("BOOKING ERROR:", err?.message);
+    console.error("BOOKING ERROR:", err.message);
     return NextResponse.json(
-      {
-        success: false,
-        message: "Server error",
-        error: err?.message,
-      },
+      { success: false, message: "Server error", error: err.message },
       { status: 500 }
     );
   }

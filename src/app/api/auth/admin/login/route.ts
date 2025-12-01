@@ -1,3 +1,4 @@
+///api/auth/admin/login
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 

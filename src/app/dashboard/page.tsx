@@ -11,25 +11,17 @@ interface Booking {
   date: string;
   time: string;
   name: string;
+  phone: string;
   number: number;
+  image?: string | null;
 }
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState({
-    totalPatients: 0,
-    todayAppointments: 0,
-    pending: 0,
-    completed: 0,
-  });
-
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // ==========================
-  // تحميل الحجوزات
-  // ==========================
   useEffect(() => {
     loadBookings();
   }, []);
@@ -40,57 +32,31 @@ export default function DashboardPage() {
       setError(null);
 
       const token = localStorage.getItem("token");
-      if (!token) {
-        setError("برجاء تسجيل الدخول مرة أخرى (لا يوجد توكن).");
-        return;
-      }
 
       const res = await fetch("/api/booking", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
+
       if (!res.ok || !data.success) {
-        console.error("LOAD BOOKINGS ERROR:", data);
-        setError(data.message || "فشل في تحميل الحجوزات");
+        setError("فشل تحميل الحجوزات");
         return;
       }
 
-      const list: Booking[] = data.bookings || [];
-      setBookings(list);
-
-      const today = new Date().toISOString().slice(0, 10);
-
-      setStats({
-        totalPatients: list.length,
-        todayAppointments: list.filter((b) => b.date === today).length,
-        pending: list.filter((b) => b.status === "pending").length,
-        completed: list.filter((b) => b.status === "confirmed").length,
-      });
-    } catch (err) {
-      console.error("Error loading bookings:", err);
-      setError("خطأ في تحميل البيانات");
+      setBookings(data.bookings);
+    } catch {
+      setError("خطأ أثناء التحميل");
     } finally {
       setLoading(false);
     }
   }
 
-  // ==========================
-  // تغيير حالة الحجز
-  // ==========================
   const toggleStatus = async (id: string, newStatus: BookingStatus) => {
     try {
       setActionLoadingId(id);
-      setError(null);
 
       const token = localStorage.getItem("token");
-      if (!token) {
-        alert("برجاء تسجيل الدخول مرة أخرى (لا يوجد توكن محفوظ).");
-        return;
-      }
 
       const res = await fetch("/api/booking/toggle", {
         method: "POST",
@@ -102,84 +68,64 @@ export default function DashboardPage() {
       });
 
       const data = await res.json();
-      console.log("TOGGLE RESPONSE:", data);
 
       if (!res.ok || !data.success) {
-        console.error("TOGGLE ERROR:", data);
-        alert(data.message || "فشل تغيير حالة الحجز");
+        alert("فشل تغيير الحالة");
         return;
       }
 
-      // إعادة تحميل الحجوزات بعد التغيير
       await loadBookings();
-    } catch (err) {
-      console.error("toggle error:", err);
-      alert("حدث خطأ أثناء تحديث حالة الحجز");
     } finally {
       setActionLoadingId(null);
     }
   };
 
   return (
-    <div className="space-y-10">
-      {/* Title */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800">لوحة التحكم</h1>
-        <p className="text-gray-500 mt-1">نظرة عامة على العيادة</p>
-      </div>
+    <div className="space-y-10 p-6">
+      <h1 className="text-3xl font-bold text-center mb-6">لوحة التحكم</h1>
 
-      {/* حالة التحميل / الأخطاء */}
-      {loading && (
-        <p className="text-center text-sm text-gray-500">جارٍ تحميل الحجوزات...</p>
-      )}
-      {error && (
-        <p className="text-center text-sm text-red-600 font-semibold">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-red-600 text-center">{error}</p>}
+      {loading && <p className="text-center">جارٍ التحميل...</p>}
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow text-center">
-          <h3 className="text-xl font-bold">{stats.totalPatients}</h3>
-          <p className="text-gray-600 text-sm">عدد المرضى</p>
-        </div>
+      <div className="space-y-6">
+        {bookings.map((s) => (
+          <div
+            key={s._id}
+            className="p-5 rounded-xl border bg-white shadow-md flex flex-col gap-5"
+          >
+            {/* القسم الأول: الصورة + البيانات الأساسية */}
+            <div className="flex gap-5 items-center">
+              {/* الصورة */}
+              {s.image ? (
+                <img
+                  src={s.image}
+                  className="w-16 h-16 rounded-xl border object-cover"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-xl bg-gray-200 flex items-center justify-center text-3xl text-gray-600">
+                  🧑
+                </div>
+              )}
 
-        <div className="bg-white p-6 rounded-xl shadow text-center">
-          <h3 className="text-xl font-bold">{stats.todayAppointments}</h3>
-          <p className="text-gray-600 text-sm">جلسات اليوم</p>
-        </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-gray-800">
+                  {s.consultationType}
+                </h3>
 
-        <div className="bg-white p-6 rounded-xl shadow text-center">
-          <h3 className="text-xl font-bold">{stats.pending}</h3>
-          <p className="text-gray-600 text-sm">منتظرة</p>
-        </div>
+                <div className="text-gray-600 text-sm">
+                  <b>الاسم:</b> {s.name}
+                </div>
 
-        <div className="bg-white p-6 rounded-xl shadow text-center">
-          <h3 className="text-xl font-bold">{stats.completed}</h3>
-          <p className="text-gray-600 text-sm">مكتملة</p>
-        </div>
-      </div>
+                <div className="text-gray-600 text-sm">
+                  <b>الهاتف:</b> {s.phone}
+                </div>
 
-      {/* Bookings */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-xl font-bold mb-4">الحجوزات القادمة</h2>
+                <div className="text-gray-600 text-sm">
+                  <b>الموعد:</b> {s.date} - {s.time}
+                </div>
 
-        {bookings.length === 0 && !loading && (
-          <p className="text-gray-500 text-sm text-center">
-            لا يوجد حجوزات حالياً.
-          </p>
-        )}
-
-        <div className="space-y-4">
-          {bookings.map((s) => (
-            <div
-              key={s._id}
-              className="p-4 rounded-xl border flex items-center justify-between gap-4"
-            >
-              <div className="flex items-center gap-4">
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  className={`px-3 py-1 mt-1 inline-block rounded-full text-sm font-semibold ${
                     s.status === "pending"
                       ? "bg-yellow-100 text-yellow-700"
                       : s.status === "confirmed"
@@ -193,81 +139,75 @@ export default function DashboardPage() {
                     ? "مؤكدة"
                     : "مرفوضة"}
                 </span>
-
-                <div>
-                  <h4 className="font-semibold">{s.consultationType}</h4>
-                  <p className="text-gray-500 text-sm">
-                    {s.date} - {s.time} - {s.name}
-                  </p>
-                </div>
-              </div>
-
-              {/* أزرار تغيير الحالة */}
-              <div className="flex gap-2">
-                {s.status === "pending" && (
-                  <>
-                    <button
-                      disabled={actionLoadingId === s._id}
-                      onClick={() => toggleStatus(s._id, "confirmed")}
-                      className="px-3 py-1 bg-teal-600 text-white rounded-full text-sm disabled:opacity-60"
-                    >
-                      {actionLoadingId === s._id ? "..." : "تأكيد"}
-                    </button>
-                    <button
-                      disabled={actionLoadingId === s._id}
-                      onClick={() => toggleStatus(s._id, "rejected")}
-                      className="px-3 py-1 bg-red-600 text-white rounded-full text-sm disabled:opacity-60"
-                    >
-                      {actionLoadingId === s._id ? "..." : "رفض"}
-                    </button>
-                  </>
-                )}
-
-                {s.status === "confirmed" && (
-                  <>
-                    <button
-                      disabled={actionLoadingId === s._id}
-                      onClick={() => toggleStatus(s._id, "pending")}
-                      className="px-3 py-1 bg-yellow-600 text-white rounded-full text-sm disabled:opacity-60"
-                    >
-                      {actionLoadingId === s._id ? "..." : "إرجاع لمنتظرة"}
-                    </button>
-                    <button
-                      disabled={actionLoadingId === s._id}
-                      onClick={() => toggleStatus(s._id, "rejected")}
-                      className="px-3 py-1 bg-red-600 text-white rounded-full text-sm disabled:opacity-60"
-                    >
-                      {actionLoadingId === s._id ? "..." : "رفض"}
-                    </button>
-                  </>
-                )}
-
-                {s.status === "rejected" && (
-                  <>
-                    <button
-                      disabled={actionLoadingId === s._id}
-                      onClick={() => toggleStatus(s._id, "confirmed")}
-                      className="px-3 py-1 bg-green-600 text-white rounded-full text-sm disabled:opacity-60"
-                    >
-                      {actionLoadingId === s._id ? "..." : "تأكيد"}
-                    </button>
-                    <button
-                      disabled={actionLoadingId === s._id}
-                      onClick={() => toggleStatus(s._id, "pending")}
-                      className="px-3 py-1 bg-yellow-600 text-white rounded-full text-sm disabled:opacity-60"
-                    >
-                      {actionLoadingId === s._id ? "..." : "إرجاع لمنتظرة"}
-                    </button>
-                  </>
-                )}
-              </div>
-
-              <div className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full font-bold">
-                {s.number || 1}
               </div>
             </div>
-          ))}
-        </div>
+
+            {/* فاصل */}
+            <hr className="border-gray-300" />
+
+            {/* رقم الحجز */}
+            <div className="text-lg font-bold text-gray-800">
+              رقم الحجز:
+              <span className="text-teal-700 ml-2">{s.number}</span>
+            </div>
+
+            {/* لو في صورة → زر “عرض الصورة” */}
+            {s.image && (
+              <button
+                onClick={() => window.open(s.image, "_blank")}
+                className="px-4 py-2 bg-blue-600 text-white rounded-full w-fit"
+              >
+                عرض الصورة
+              </button>
+            )}
+
+            {/* فاصل */}
+            <hr className="border-gray-300" />
+
+            {/* أزرار التحكم */}
+            <div className="flex gap-3 flex-wrap">
+              {s.status === "pending" && (
+                <>
+                  <button
+                    disabled={actionLoadingId === s._id}
+                    onClick={() => toggleStatus(s._id, "confirmed")}
+                    className="bg-teal-600 text-white px-4 py-2 rounded-full"
+                  >
+                    {actionLoadingId === s._id ? "..." : "تأكيد"}
+                  </button>
+
+                  <button
+                    disabled={actionLoadingId === s._id}
+                    onClick={() => toggleStatus(s._id, "rejected")}
+                    className="bg-red-600 text-white px-4 py-2 rounded-full"
+                  >
+                    {actionLoadingId === s._id ? "..." : "رفض"}
+                  </button>
+                </>
+              )}
+
+              {s.status === "confirmed" && (
+                <button
+                  disabled={actionLoadingId === s._id}
+                  onClick={() => toggleStatus(s._id, "pending")}
+                  className="bg-yellow-600 text-white px-4 py-2 rounded-full"
+                >
+                  {actionLoadingId === s._id ? "..." : "إرجاع لمنتظرة"}
+                </button>
+              )}
+
+              {s.status === "rejected" && (
+                <button
+                  disabled={actionLoadingId === s._id}
+                  onClick={() => toggleStatus(s._id, "confirmed")}
+                  className="bg-green-600 text-white px-4 py-2 rounded-full"
+                >
+                  {actionLoadingId === s._id ? "..." : "تأكيد"}
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

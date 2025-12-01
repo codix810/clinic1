@@ -8,19 +8,21 @@ export async function GET() {
 
     const bookings = await Booking.find().sort({ createdAt: -1 }).lean();
 
-    const mapped = bookings.map(b => ({
-      ...b,
-      consultationType: b.type,  // تغيير الاسم عشان الفرنت
-      number: 1,                 // ثابت مؤقتًا
-    }));
-
     return NextResponse.json({
       success: true,
-      bookings: mapped,
+      bookings: bookings.map((b: any) => ({
+        _id: b._id,
+        consultationType: b.type,
+        date: b.date,
+        time: b.time,
+        name: b.name,
+        phone: b.phone,
+        status: b.status,
+        number: 1,
+        image: b.transferImageUrl || null, // ← هنا أهم حاجة
+      })),
     });
   } catch (err) {
-    console.error("GET /api/booking error:", err);
-
     return NextResponse.json(
       { success: false, error: "Server error" },
       { status: 500 }

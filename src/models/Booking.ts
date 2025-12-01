@@ -1,3 +1,4 @@
+// models/Booking.ts
 import { Schema, models, model, Document } from "mongoose";
 
 export interface IBooking extends Document {
@@ -11,6 +12,8 @@ export interface IBooking extends Document {
   time: string;
   type: string;
   notes?: string;
+  fee?: number;
+  transferImageUrl?: string;
   status: "pending" | "confirmed" | "rejected";
   createdAt: Date;
 }
@@ -27,6 +30,11 @@ const bookingSchema = new Schema<IBooking>(
     time: { type: String, required: true },
     type: { type: String, required: true },
     notes: { type: String },
+    fee: { type: Number },
+
+    // 🔥 أهم حاجة: رابط الصورة
+    transferImageUrl: { type: String },
+
     status: {
       type: String,
       enum: ["pending", "confirmed", "rejected"],

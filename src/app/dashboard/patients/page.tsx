@@ -1,4 +1,3 @@
-// src/app/dashboard/patients/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,48 +15,17 @@ export default function PatientsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = typeof window !== "undefined"
-      ? localStorage.getItem("token")
-      : null;
-
-
-    if (!token) {
-      console.log("No token found in localStorage");
-      setLoading(false);
-      return;
-    }
+    const token = localStorage.getItem("token");
 
     (async () => {
-      try {
-        const res = await fetch("/api/patients", {
-  method: "GET",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: "Bearer " + localStorage.getItem("token"),
-  },
-})
-        if (!res.ok) {
-          const text = await res.text();
-          console.log("API Error status:", res.status);
-          console.log("API Error body:", text);
-          setPatients([]);
-          return;
-        }
+      const res = await fetch("/api/patients", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const data = await res.json();
-        console.log("API data:", data);
+      const data = await res.json();
+      if (data.success) setPatients(data.patients);
 
-        if (data.success && Array.isArray(data.patients)) {
-          setPatients(data.patients);
-        } else {
-          setPatients([]);
-        }
-      } catch (err) {
-        console.log("Fetch Error:", err);
-        setPatients([]);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(false);
     })();
   }, []);
 
@@ -65,109 +33,104 @@ export default function PatientsPage() {
     p.fullName.toLowerCase().includes(search.toLowerCase()) ||
     p.phone.includes(search)
   );
+const deletePatient = async (id: string) => {
+  if (!confirm("هل تريد حذف هذا المريض؟")) return;
+
+  const res = await fetch(`/api/patients/${id}`, {
+    method: "DELETE",
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert("تم حذف المريض");
+    setPatients((prev) => prev.filter((p) => p._id !== id));
+  } else {
+    alert("فشل حذف المريض");
+  }
+};
 
   return (
-    <div className="space-y-10">
-      {/* Page Title */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800">قائمة المرضى</h1>
-        <p className="text-gray-500 mt-1">إدارة وبحث عن معلومات المرضى</p>
-      </div>
+    <div className="space-y-10 p-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">قائمة المرضى</h1>
 
-      {/* Add Patient */}
-      <div className="flex justify-end">
         <a
-          href="/admin/patients/new"
-          className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2"
+          href="/dashboard/patients/new"
+          className="bg-teal-600 text-white px-4 py-2 rounded-full"
         >
-          <i className="fa-regular fa-calendar-plus"></i>
-          مريض جديد
+          + مريض جديد
         </a>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="ابحث بالاسم أو رقم الهاتف..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full p-4 pr-12 border rounded-xl bg-gray-50 focus:outline-none focus:border-teal-600"
-        />
-        <i className="fa-solid fa-magnifying-glass absolute right-4 top-4 text-gray-500 text-lg"></i>
-      </div>
+      <input
+        placeholder="بحث..."
+        className="w-full border p-3 rounded-lg"
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-      {/* Table */}
-      <div className="bg-white p-6 rounded-xl shadow overflow-x-auto min-h-[300px]">
+      <div className="bg-white rounded-xl shadow p-4">
         {loading ? (
-          <div className="text-center text-gray-500 p-10">جاري التحميل...</div>
+          <div>جاري التحميل...</div>
         ) : (
-          <table className="w-full min-w-[800px] text-center">
+          <table className="w-full text-center">
             <thead>
               <tr className="bg-gray-100 text-gray-700 text-sm">
-                <th className="p-4">اسم المريض</th>
-                <th className="p-4">تاريخ التسجيل</th>
-                <th className="p-4">رقم التواصل</th>
-                <th className="p-4">إجراءات</th>
+                <th className="p-3">الاسم</th>
+                <th className="p-3">التاريخ</th>
+                <th className="p-3">الهاتف</th>
+                <th className="p-3">إجراءات</th>
               </tr>
             </thead>
 
             <tbody>
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="p-6 text-gray-500">
-                    لا توجد نتائج مطابقة للبحث
-                  </td>
-                </tr>
-              )}
-
               {filtered.map((p) => (
                 <tr key={p._id} className="border-b">
-                  <td className="p-4 font-semibold">{p.fullName}</td>
-                  <td className="p-4 text-gray-600">
+                  <td className="p-3">{p.fullName}</td>
+                  <td className="p-3">
                     {p.createdAt
                       ? new Date(p.createdAt).toLocaleDateString("ar")
                       : "-"}
                   </td>
-                  <td className="p-4">{p.phone}</td>
+                  <td className="p-3">{p.phone}</td>
 
-                  <td className="p-4">
-                    <div className="flex items-center justify-center gap-3">
-                      <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-teal-100 text-gray-600 hover:text-teal-600 transition">
-                        <i className="fa-regular fa-pen-to-square"></i>
-                      </button>
+                  <td className="p-3 flex justify-center gap-3">
+                    <a
+                      href={`/dashboard/patients/${p._id}`}
+                      className="bg-gray-100 text-gray-600 px-3 py-2 rounded-full"
+                    >
+                      👁 عرض
+                    </a>
 
-                      <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-teal-100 text-gray-600 hover:text-teal-600 transition">
-                        <i className="fa-regular fa-folder-open"></i>
-                      </button>
+                    <a
+                      href={`/dashboard/patients/edit/${p._id}`}
+                      className="bg-teal-100 text-teal-700 px-3 py-2 rounded-full"
+                    >
+                      ✏ تعديل
+                    </a>
 
-                      <a
-                        href={`/admin/patients/${p._id}`}
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-teal-100 text-gray-600 hover:text-teal-600 transition"
-                      >
-                        <i className="fa-regular fa-eye"></i>
-                      </a>
-                    </div>
+
+                    <button
+  onClick={() => deletePatient(p._id)}
+  className="bg-red-100 text-red-600 px-3 py-2 rounded-full"
+>
+  🗑 حذف
+</button>
+
                   </td>
                 </tr>
               ))}
+
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-gray-500">
+                    لا يوجد نتائج
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         )}
-      </div>
-
-      {/* Pagination مؤقت */}
-      <div className="flex justify-between items-center mt-6 text-gray-600 text-sm">
-        <div>
-          عرض {filtered.length} من {patients.length} نتيجة
-        </div>
-
-        <div className="flex gap-2">
-          <button className="px-4 py-2 border rounded-lg">التالي</button>
-          <button className="px-4 py-2 border rounded-lg bg-teal-600 text-white">
-            1
-          </button>
-        </div>
       </div>
     </div>
   );
