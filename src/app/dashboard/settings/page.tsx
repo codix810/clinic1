@@ -128,10 +128,13 @@ const res = await fetch("/api/settings", {
 const deleteHour = (day: string, index: number) => {
   if (!confirm("هل أنت متأكد من الحذف؟")) return;
 
-const updated = hours[day].filter((slot: { from: string; to: string }, i: number) => i !== index);
+  const updated = hours[day].filter(
+    (slot: { from: string; to: string }, i: number) => i !== index
+  );
+
   setHours({ ...hours, [day]: updated });
 };
-;
+
 
   if (loading) return <p className="text-center mt-10">جارٍ التحميل...</p>;
 
