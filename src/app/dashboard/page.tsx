@@ -154,7 +154,7 @@ export default function DashboardPage() {
             {/* لو في صورة → زر “عرض الصورة” */}
             {s.image && (
               <button
-                onClick={() => window.open(s.image, "_blank")}
+                onClick={() => s.image && window.open(s.image as string, "_blank")}
                 className="px-4 py-2 bg-blue-600 text-white rounded-full w-fit"
               >
                 عرض الصورة
