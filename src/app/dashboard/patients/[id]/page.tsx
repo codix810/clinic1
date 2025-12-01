@@ -4,13 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function PatientView({ params }: any) {
-  // ← هنا التصليح الحقيقي
-  const { id } = params;
-
+  const [id, setId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [patient, setPatient] = useState<any>(null);
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // --------- حل مشكلة Promise params ---------
+  useEffect(() => {
+    if (!params) return;
+
+    Promise.resolve(params).then((p: any) => {
+      setId(p.id);
+    });
+  }, [params]);
+  // -------------------------------------------
 
   useEffect(() => {
     if (!id) return;
@@ -35,7 +43,7 @@ export default function PatientView({ params }: any) {
           setPatient(data.patient);
           setBooking(data.booking || null);
         }
-      } catch (err) {
+      } catch {
         setError("خطأ في الاتصال");
       } finally {
         setLoading(false);
@@ -43,7 +51,7 @@ export default function PatientView({ params }: any) {
     })();
   }, [id]);
 
-  if (loading) return <div className="p-6">جاري التحميل...</div>;
+  if (loading || !id) return <div className="p-6">جاري التحميل...</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
   if (!patient) return <div className="p-6">لا يوجد بيانات للمريض.</div>;
 
@@ -129,10 +137,6 @@ export default function PatientView({ params }: any) {
             <b>الحالة:</b> {booking.status || "-"}
           </p>
         </div>
-      )}
-
-      {!booking && (
-        <p className="text-gray-400 mt-6">لا يوجد حجز مرتبط بهذا المريض.</p>
       )}
     </>
   );
