@@ -1,11 +1,11 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function PatientView({ params }: any) {
-  // ← التصليح الوحيد هنا
-  const { id } = use(params);
+  // ← هنا التصليح الحقيقي
+  const { id } = params;
 
   const [loading, setLoading] = useState(true);
   const [patient, setPatient] = useState<any>(null);
@@ -33,7 +33,7 @@ export default function PatientView({ params }: any) {
           setPatient(null);
         } else {
           setPatient(data.patient);
-          setBooking(data.booking || null); // ← إضافة بسيطة للبوكينج
+          setBooking(data.booking || null);
         }
       } catch (err) {
         setError("خطأ في الاتصال");
@@ -65,6 +65,7 @@ export default function PatientView({ params }: any) {
             >
               ✏ تعديل
             </Link>
+
             <Link
               href="/dashboard/patients"
               className="px-4 py-2 bg-gray-100 rounded-full"
@@ -108,21 +109,22 @@ export default function PatientView({ params }: any) {
         </div>
       </div>
 
-      {/* عرض الحجز لو موجود */}
       {booking && (
         <div className="bg-white p-4 rounded-xl shadow mt-6">
           <h2 className="text-xl font-bold mb-3">آخر حجز للمريض</h2>
 
           <p>
-            <b>نوع الاستشارة:</b>{" "}
-            {booking.consultationType || booking.type || "-"}
+            <b>نوع الاستشارة:</b> {booking.consultationType || booking.type || "-"}
           </p>
+
           <p>
             <b>التاريخ:</b> {booking.date || "-"}
           </p>
+
           <p>
             <b>الوقت:</b> {booking.time || "-"}
           </p>
+
           <p>
             <b>الحالة:</b> {booking.status || "-"}
           </p>
