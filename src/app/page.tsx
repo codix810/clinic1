@@ -10,7 +10,7 @@ export default function Home() {
       <main className="flex mt-16 items-center justify-between gap-20 max-md:flex-col">
         <img
           src="/n.jpg"
-          className="rounded-2xl w-[450px] max-md:w-full"
+          className="rounded-2xl w-[40px] max-md:w-full"
         />
 
         {/* Info */}
