@@ -33,7 +33,6 @@ const onlineTimes = [
 ];
 
 export default function Booking() {
-  // form states
   const [consultType, setConsultType] = useState("");
   const [place, setPlace] = useState("");
   const [branch, setBranch] = useState("cairo");
@@ -42,11 +41,8 @@ export default function Booking() {
   const [fee, setFee] = useState("");
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
-
-  // preview image
   const [preview, setPreview] = useState<string | null>(null);
 
-  // calendar state
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
@@ -55,19 +51,16 @@ export default function Booking() {
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // get day object
   const getDayObj = (day: number) => {
     const d = new Date(year, month, day);
     return {
       dayNumber: day,
       dayName: dayNames[d.getDay()],
       dateStr: d.toISOString().slice(0, 10),
-      disabled:
-        d < new Date(today.toDateString()) || d.getDay() === 5,
+      disabled: d < new Date(today.toDateString()) || d.getDay() === 5,
     };
   };
 
-  // submit
   const handleSubmit = async () => {
     if (!consultType) return alert("اختر نوع الاستشارة");
     if (!place) return alert("اختر مكان الاستشارة");
@@ -97,14 +90,11 @@ export default function Booking() {
       });
 
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        return alert(data.message || "حدث خطأ أثناء الحجز");
-      }
+      if (!res.ok || !data.success) return alert(data.message || "حدث خطأ");
 
       alert("تم تسجيل الحجز بنجاح");
 
-      // reset
+      // reset form
       setConsultType("");
       setPlace("");
       setBranch("cairo");
@@ -127,7 +117,7 @@ export default function Booking() {
 
       {/* Title */}
       <div className="text-center mt-10">
-        <h1 className="text-3xl font-bold">حجز موعد</h1>
+        <h1 className="text-3xl font-bold text-gray-800">حجز موعد</h1>
         <p className="text-gray-500 mt-2">يرجى ملء البيانات التالية</p>
       </div>
 
@@ -135,31 +125,35 @@ export default function Booking() {
 
         {/* نوع الاستشارة */}
         <div>
-          <label className="font-semibold">نوع الاستشارة *</label>
-          <select
-            value={consultType}
-            onChange={(e) => setConsultType(e.target.value)}
-            className="w-full border p-3 rounded-xl mt-2"
-          >
-            <option value="">اختر نوع الاستشارة</option>
-            <option value="كشف">كشف</option>
-            <option value="متابعة">متابعة</option>
-            <option value="استشارة">استشارة</option>
-          </select>
+          <label className="font-semibold text-gray-700">نوع الاستشارة *</label>
+          <div className="relative w-full mt-2">
+            <select
+              value={consultType}
+              onChange={(e) => setConsultType(e.target.value)}
+              className="w-full p-3 rounded-4xl border  border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition pr-10 cursor-pointer"
+            >
+              <option value="" >اختر نوع الاستشارة</option>
+              <option value="كشف" >كشف</option>
+              <option value="متابعة" >متابعة</option>
+              <option value="استشارة" >استشارة</option>
+            </select>
+            <span className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <i className="fa-solid fa-chevron-down"></i>
+            </span>
+          </div>
         </div>
 
         {/* مكان الاستشارة */}
         {consultType && (
           <div>
-            <label className="font-semibold">مكان الاستشارة *</label>
-
+            <label className="font-semibold text-gray-700">مكان الاستشارة *</label>
             <div className="flex gap-4 mt-3">
               <button
                 onClick={() => setPlace("offline")}
-                className={`flex-1 p-3 rounded-xl border ${
+                className={`flex-1 p-3 rounded-xl border text-gray-700 font-semibold transition ${
                   place === "offline"
-                    ? "border-teal-600 bg-teal-50"
-                    : "border-gray-300"
+                    ? "bg-teal-50 border-teal-600"
+                    : "bg-white border-gray-300 hover:bg-teal-50"
                 }`}
               >
                 في العيادة
@@ -167,10 +161,10 @@ export default function Booking() {
 
               <button
                 onClick={() => setPlace("online")}
-                className={`flex-1 p-3 rounded-xl border ${
+                className={`flex-1 p-3 rounded-xl border text-gray-700 font-semibold transition ${
                   place === "online"
-                    ? "border-teal-600 bg-teal-50"
-                    : "border-gray-300"
+                    ? "bg-teal-50 border-teal-600"
+                    : "bg-white border-gray-300 hover:bg-teal-50"
                 }`}
               >
                 أونلاين
@@ -183,49 +177,53 @@ export default function Booking() {
         {place && (
           <>
             <div>
-              <label className="font-semibold">اسم المريض *</label>
+              <label className="font-semibold text-gray-700">اسم المريض *</label>
               <input
-                className="w-full border p-3 rounded-xl mt-2"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="w-full mt-2 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
               />
             </div>
 
             <div>
-              <label className="font-semibold">رقم الهاتف *</label>
+              <label className="font-semibold text-gray-700">رقم الهاتف *</label>
               <input
-                className="w-full border p-3 rounded-xl mt-2"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                className="w-full mt-2 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
               />
             </div>
           </>
         )}
 
         {/* الفرع */}
-        {place === "offline" && (
+       {place === "offline" && (
           <div>
-            <label className="font-semibold">اختر الفرع *</label>
-            <select
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="w-full border p-3 rounded-xl mt-2"
-            >
-              <option value="cairo">فرع القاهرة</option>
-              <option value="alex">فرع الإسكندرية</option>
-            </select>
+            <label className="font-semibold text-gray-700">اختر الفرع *</label>
+            <div className="relative w-full mt-2">
+              <select
+                value={branch}
+                onChange={(e) => setBranch(e.target.value)}
+                className="w-full p-3 rounded-xl border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition pr-10 cursor-pointer"
+              >
+                <option value="cairo">فرع القاهرة</option>
+                <option value="alex">فرع الإسكندرية</option>
+              </select>
+              <span className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <i className="fa-solid fa-chevron-down"></i>
+              </span>
+            </div>
           </div>
         )}
-
         {/* مبلغ الحجز */}
         {place === "online" && (
           <div>
-            <label className="font-semibold">مبلغ الحجز *</label>
+            <label className="font-semibold text-gray-700">مبلغ الحجز *</label>
             <input
               type="number"
-              className="w-full border p-3 rounded-xl mt-2"
               value={fee}
               onChange={(e) => setFee(e.target.value)}
+              className="w-full mt-2 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
             />
           </div>
         )}
@@ -233,11 +231,11 @@ export default function Booking() {
         {/* ملاحظات */}
         {place && (
           <div>
-            <label className="font-semibold">ملاحظات للطبيب</label>
+            <label className="font-semibold text-gray-700">ملاحظات للطبيب</label>
             <textarea
-              className="w-full border p-3 rounded-xl mt-2"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+              className="w-full mt-2 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
             />
           </div>
         )}
@@ -245,26 +243,17 @@ export default function Booking() {
         {/* رفع صورة الدفع */}
         {place === "online" && (
           <div>
-            <label className="font-semibold">رفع سكرين شوت التحويل *</label>
-
+            <label className="font-semibold text-gray-700">رفع سكرين شوت التحويل *</label>
             <div
-              className="border-dashed border-2 p-10 text-center rounded-xl mt-3 cursor-pointer hover:bg-blue-50"
+              className="border-2 border-dashed p-10 rounded-xl mt-3 text-center cursor-pointer hover:bg-blue-50 transition"
               onClick={() => document.getElementById("fileUpload")?.click()}
             >
               <i className="fa-solid fa-arrow-up text-4xl text-teal-600"></i>
               <p className="text-gray-600 mt-2">اضغط لرفع ملف الدفع</p>
 
-              {file && (
-                <p className="text-green-600 mt-3 font-semibold">
-                  {file.name}
-                </p>
-              )}
-
+              {file && <p className="text-green-600 mt-3 font-semibold">{file.name}</p>}
               {preview && (
-                <img
-                  src={preview}
-                  className="w-40 mx-auto mt-4 rounded-xl shadow"
-                />
+                <img src={preview} className="w-40 mx-auto mt-4 rounded-xl shadow" />
               )}
 
               <input
@@ -285,24 +274,21 @@ export default function Booking() {
         {/* Calendar */}
         {place && (
           <div>
-            <label className="font-semibold">اختيار التاريخ *</label>
-
-            <div className="bg-white p-4 rounded-xl border mt-3">
-              {/* Calendar Header */}
+            <label className="font-semibold text-gray-700">اختيار التاريخ *</label>
+            <div className="bg-white p-4 rounded-xl border mt-3 shadow">
+              {/* Header */}
               <div className="flex justify-between items-center mb-4">
                 <button
-                  className="p-2 bg-teal-600 text-white rounded-lg"
+                  className="p-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
                   onClick={() => setMonth(month === 0 ? 11 : month - 1)}
                 >
                   <i className="fa-solid fa-chevron-right" />
                 </button>
 
-                <h3 className="font-bold text-lg">
-                  {year} / {month + 1}
-                </h3>
+                <h3 className="font-bold text-lg text-gray-800">{year} / {month + 1}</h3>
 
                 <button
-                  className="p-2 bg-teal-600 text-white rounded-lg"
+                  className="p-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
                   onClick={() => setMonth(month === 11 ? 0 : month + 1)}
                 >
                   <i className="fa-solid fa-chevron-left" />
@@ -317,18 +303,16 @@ export default function Booking() {
                     <div
                       key={i}
                       onClick={() => !d.disabled && setSelectedDate(d.dateStr)}
-                      className={`p-3 rounded-xl cursor-pointer ${
+                      className={`p-3 rounded-xl cursor-pointer border transition ${
                         d.disabled
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-white border hover:bg-teal-50"
-                      } ${
-                        selectedDate === d.dateStr
-                          ? "border-teal-600 bg-teal-100"
-                          : ""
+                          : selectedDate === d.dateStr
+                          ? "bg-teal-100 border-teal-600"
+                          : "bg-white hover:bg-teal-50"
                       }`}
                     >
                       <div className="text-sm text-gray-500">{d.dayName}</div>
-                      <div className="text-lg font-bold">{d.dayNumber}</div>
+                      <div className="text-lg font-bold text-gray-800">{d.dayNumber}</div>
                     </div>
                   );
                 })}
@@ -340,24 +324,21 @@ export default function Booking() {
         {/* Time Slots */}
         {selectedDate && (
           <div>
-            <label className="font-semibold">اختيار الوقت *</label>
-
+            <label className="font-semibold text-gray-700">اختيار الوقت *</label>
             <div className="mt-3 grid md:grid-cols-3 gap-4">
-              {(place === "online" ? onlineTimes : branchTimes[branch]).map(
-                (time: string, i: number) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedTime(time)}
-                    className={`p-3 rounded-xl border text-center ${
-                      selectedTime === time
-                        ? "border-teal-600 bg-teal-100"
-                        : "border-gray-300 hover:bg-teal-50"
-                    }`}
-                  >
-                    {time}
-                  </button>
-                )
-              )}
+              {(place === "online" ? onlineTimes : branchTimes[branch]).map((time: string, i: number) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedTime(time)}
+                  className={`p-3 rounded-xl border text-center transition ${
+                    selectedTime === time
+                      ? "border-teal-600 bg-teal-100"
+                      : "border-gray-300 hover:bg-teal-50"
+                  }`}
+                >
+                  {time}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -365,10 +346,11 @@ export default function Booking() {
         {/* Submit */}
         <button
           onClick={handleSubmit}
-          className="w-full p-4 bg-green-600 text-white font-bold rounded-xl mt-10 hover:bg-green-700"
+          className="w-full p-4 bg-green-600 text-white font-bold rounded-xl mt-10 hover:bg-green-700 transition"
         >
           احجز الآن
         </button>
+
       </div>
     </div>
   );
