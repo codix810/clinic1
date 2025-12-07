@@ -24,9 +24,6 @@ export default function CalendarPage() {
 
   const monthName = currentMonth.toLocaleString("ar", { month: "long" });
 
-  // ============================
-  //    Load calendar from API
-  // ============================
   useEffect(() => {
     loadCalendar(year, month);
   }, [currentMonth]);
@@ -48,9 +45,6 @@ export default function CalendarPage() {
     }
   }
 
-  // ============================
-  //     Generate days grid
-  // ============================
   const getDays = () => {
     const days = [];
     const firstDay = new Date(year, month, 1);
@@ -67,17 +61,15 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 p-4 md:p-10">
       <h1 className="text-3xl font-bold text-center">التقويم</h1>
 
-      <div className="bg-white p-6 rounded-xl shadow max-w-4xl mx-auto">
+      <div className="bg-white p-4 md:p-6 rounded-xl shadow max-w-4xl mx-auto overflow-x-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <button
             className="text-lg px-3 py-1 bg-gray-200 rounded"
-            onClick={() =>
-              setCurrentMonth(new Date(year, month - 1, 1))
-            }
+            onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
           >
             ‹
           </button>
@@ -88,16 +80,14 @@ export default function CalendarPage() {
 
           <button
             className="text-lg px-3 py-1 bg-gray-200 rounded"
-            onClick={() =>
-              setCurrentMonth(new Date(year, month + 1, 1))
-            }
+            onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
           >
             ›
           </button>
         </div>
 
         {/* Week days */}
-        <div className="grid grid-cols-7 text-center font-semibold text-gray-700 mb-3">
+        <div className="grid grid-cols-7 text-center font-semibold text-gray-700 mb-3 text-xs md:text-sm">
           {["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"].map(
             (d) => (
               <div key={d} className="py-2">
@@ -108,22 +98,20 @@ export default function CalendarPage() {
         </div>
 
         {/* Calendar days */}
-        <div className="grid grid-cols-7 gap-2 text-center">
+        <div className="grid grid-cols-7 md:grid-cols-7 gap-2 text-center min-w-[300px]">
           {getDays().map((day, i) =>
             day ? (
               <div
                 key={i}
                 onClick={() => setSelectedDay(day)}
-                className={`p-3 border rounded-lg cursor-pointer hover:bg-teal-50 ${
-                  selectedDay &&
-                  selectedDay.toDateString() === day.toDateString()
+                className={`p-2 md:p-3 border rounded-lg cursor-pointer hover:bg-teal-50 ${
+                  selectedDay && selectedDay.toDateString() === day.toDateString()
                     ? "bg-teal-100 border-teal-600"
                     : ""
                 }`}
               >
-                <div className="font-bold">{day.getDate()}</div>
+                <div className="font-bold text-sm md:text-base">{day.getDate()}</div>
 
-                {/* Dot indicator */}
                 {appointments.some(
                   (a) => a.date === day.toISOString().slice(0, 10)
                 ) && (
@@ -139,7 +127,7 @@ export default function CalendarPage() {
 
       {/* Day details */}
       {selectedDay && (
-        <div className="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto space-y-4">
+        <div className="bg-white p-4 md:p-6 rounded-xl shadow max-w-3xl mx-auto space-y-4">
           <h2 className="text-xl font-bold">
             مواعيد يوم:{" "}
             {selectedDay.toLocaleDateString("ar", {
@@ -149,7 +137,6 @@ export default function CalendarPage() {
             })}
           </h2>
 
-          {/* List */}
           {appointments.filter(
             (a) => a.date === selectedDay.toISOString().slice(0, 10)
           ).length === 0 ? (
@@ -163,7 +150,7 @@ export default function CalendarPage() {
                 .map((a) => (
                   <div
                     key={a._id}
-                    className="p-3 bg-gray-50 border rounded-lg flex justify-between"
+                    className="p-3 bg-gray-50 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center"
                   >
                     <div>
                       <div className="font-semibold">{a.type}</div>

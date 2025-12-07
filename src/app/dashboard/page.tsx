@@ -81,7 +81,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-10 p-6">
+    <div className="space-y-10 p-4 md:p-6">
       <h1 className="text-3xl font-bold text-center mb-6">لوحة التحكم</h1>
 
       {error && <p className="text-red-600 text-center">{error}</p>}
@@ -91,87 +91,80 @@ export default function DashboardPage() {
         {bookings.map((s) => (
           <div
             key={s._id}
-            className="p-5 rounded-xl border bg-white shadow-md flex flex-col gap-5"
+            className="p-4 md:p-5 rounded-xl border bg-white shadow-md flex flex-col md:flex-row gap-4 md:gap-5 items-start"
           >
-            {/* القسم الأول: الصورة + البيانات الأساسية */}
-            <div className="flex gap-5 items-center">
-              {/* الصورة */}
+            {/* الصورة + البيانات الأساسية */}
+            <div className="flex-shrink-0">
               {s.image ? (
                 <img
                   src={s.image}
-                  className="w-16 h-16 rounded-xl border object-cover"
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-xl border object-cover"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-xl bg-gray-200 flex items-center justify-center text-3xl text-gray-600">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gray-200 flex items-center justify-center text-3xl text-gray-600">
                   🧑
                 </div>
               )}
+            </div>
 
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-gray-800">
-                  {s.consultationType}
-                </h3>
+            <div className="flex-1 w-full space-y-1">
+              <h3 className="text-lg md:text-xl font-bold text-gray-800">
+                {s.consultationType}
+              </h3>
 
-                <div className="text-gray-600 text-sm">
-                  <b>الاسم:</b> {s.name}
-                </div>
-
-                <div className="text-gray-600 text-sm">
-                  <b>الهاتف:</b> {s.phone}
-                </div>
-
-                <div className="text-gray-600 text-sm">
-                  <b>الموعد:</b> {s.date} - {s.time}
-                </div>
-
-                <span
-                  className={`px-3 py-1 mt-1 inline-block rounded-full text-sm font-semibold ${
-                    s.status === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : s.status === "confirmed"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {s.status === "pending"
-                    ? "منتظرة"
-                    : s.status === "confirmed"
-                    ? "مؤكدة"
-                    : "مرفوضة"}
-                </span>
+              <div className="text-gray-600 text-sm md:text-base">
+                <b>الاسم:</b> {s.name}
               </div>
-            </div>
 
-            {/* فاصل */}
-            <hr className="border-gray-300" />
+              <div className="text-gray-600 text-sm md:text-base">
+                <b>الهاتف:</b> {s.phone}
+              </div>
 
-            {/* رقم الحجز */}
-            <div className="text-lg font-bold text-gray-800">
-              رقم الحجز:
-              <span className="text-teal-700 ml-2">{s.number}</span>
-            </div>
+              <div className="text-gray-600 text-sm md:text-base">
+                <b>الموعد:</b> {s.date} - {s.time}
+              </div>
 
-            {/* لو في صورة → زر “عرض الصورة” */}
-            {s.image && (
-              <button
-                onClick={() => s.image && window.open(s.image as string, "_blank")}
-                className="px-4 py-2 bg-blue-600 text-white rounded-full w-fit"
+              <span
+                className={`px-3 py-1 mt-1 inline-block rounded-full text-sm md:text-base font-semibold ${
+                  s.status === "pending"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : s.status === "confirmed"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
               >
-                عرض الصورة
-              </button>
-            )}
+                {s.status === "pending"
+                  ? "منتظرة"
+                  : s.status === "confirmed"
+                  ? "مؤكدة"
+                  : "مرفوضة"}
+              </span>
+            </div>
 
-            {/* فاصل */}
-            <hr className="border-gray-300" />
+            {/* رقم الحجز + عرض الصورة */}
+            <div className="flex flex-col md:items-end gap-2 mt-3 md:mt-0">
+              <div className="text-lg md:text-xl font-bold text-gray-800">
+                رقم الحجز: <span className="text-teal-700 ml-2">{s.number}</span>
+              </div>
+
+              {s.image && (
+                <button
+                  onClick={() => s.image && window.open(s.image as string, "_blank")}
+                  className="px-3 py-2 bg-blue-600 text-white rounded-full text-sm md:text-base w-fit"
+                >
+                  عرض الصورة
+                </button>
+              )}
+            </div>
 
             {/* أزرار التحكم */}
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex flex-wrap gap-2 md:gap-3 mt-3 md:mt-0 w-full md:w-auto">
               {s.status === "pending" && (
                 <>
                   <button
                     disabled={actionLoadingId === s._id}
                     onClick={() => toggleStatus(s._id, "confirmed")}
-                    className="bg-teal-600 text-white px-4 py-2 rounded-full"
+                    className="bg-teal-600 text-white px-4 py-2 rounded-full text-sm md:text-base"
                   >
                     {actionLoadingId === s._id ? "..." : "تأكيد"}
                   </button>
@@ -179,7 +172,7 @@ export default function DashboardPage() {
                   <button
                     disabled={actionLoadingId === s._id}
                     onClick={() => toggleStatus(s._id, "rejected")}
-                    className="bg-red-600 text-white px-4 py-2 rounded-full"
+                    className="bg-red-600 text-white px-4 py-2 rounded-full text-sm md:text-base"
                   >
                     {actionLoadingId === s._id ? "..." : "رفض"}
                   </button>
@@ -190,7 +183,7 @@ export default function DashboardPage() {
                 <button
                   disabled={actionLoadingId === s._id}
                   onClick={() => toggleStatus(s._id, "pending")}
-                  className="bg-yellow-600 text-white px-4 py-2 rounded-full"
+                  className="bg-yellow-600 text-white px-4 py-2 rounded-full text-sm md:text-base"
                 >
                   {actionLoadingId === s._id ? "..." : "إرجاع لمنتظرة"}
                 </button>
@@ -200,7 +193,7 @@ export default function DashboardPage() {
                 <button
                   disabled={actionLoadingId === s._id}
                   onClick={() => toggleStatus(s._id, "confirmed")}
-                  className="bg-green-600 text-white px-4 py-2 rounded-full"
+                  className="bg-green-600 text-white px-4 py-2 rounded-full text-sm md:text-base"
                 >
                   {actionLoadingId === s._id ? "..." : "تأكيد"}
                 </button>

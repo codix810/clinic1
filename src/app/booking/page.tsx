@@ -275,20 +275,23 @@ export default function Booking() {
         {place && (
           <div>
             <label className="font-semibold text-gray-700">اختيار التاريخ *</label>
-            <div className="bg-white p-4 rounded-xl border mt-3 shadow">
+
+            <div className="bg-white p-4 md:p-6 rounded-xl border mt-3 shadow">
               {/* Header */}
               <div className="flex justify-between items-center mb-4">
                 <button
-                  className="p-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+                  className="p-2 md:p-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
                   onClick={() => setMonth(month === 0 ? 11 : month - 1)}
                 >
                   <i className="fa-solid fa-chevron-right" />
                 </button>
 
-                <h3 className="font-bold text-lg text-gray-800">{year} / {month + 1}</h3>
+                <h3 className="font-bold text-lg md:text-xl text-gray-800">
+                  {year} / {month + 1}
+                </h3>
 
                 <button
-                  className="p-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+                  className="p-2 md:p-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
                   onClick={() => setMonth(month === 11 ? 0 : month + 1)}
                 >
                   <i className="fa-solid fa-chevron-left" />
@@ -296,14 +299,19 @@ export default function Booking() {
               </div>
 
               {/* Days */}
-              <div className="grid grid-cols-7 gap-3 text-center">
+              <div className="grid 
+                              grid-cols-3 
+                              sm:grid-cols-4 
+                              md:grid-cols-7 
+                              gap-2 sm:gap-3 text-center">
+
                 {[...Array(daysInMonth)].map((_, i) => {
                   const d = getDayObj(i + 1);
                   return (
                     <div
                       key={i}
                       onClick={() => !d.disabled && setSelectedDate(d.dateStr)}
-                      className={`p-3 rounded-xl cursor-pointer border transition ${
+                      className={`p-2 sm:p-3 md:p-4 rounded-xl cursor-pointer border transition ${
                         d.disabled
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : selectedDate === d.dateStr
@@ -311,8 +319,12 @@ export default function Booking() {
                           : "bg-white hover:bg-teal-50"
                       }`}
                     >
-                      <div className="text-sm text-gray-500">{d.dayName}</div>
-                      <div className="text-lg font-bold text-gray-800">{d.dayNumber}</div>
+                      <div className="text-xs sm:text-sm text-gray-500">
+                        {d.dayName}
+                      </div>
+                      <div className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
+                        {d.dayNumber}
+                      </div>
                     </div>
                   );
                 })}

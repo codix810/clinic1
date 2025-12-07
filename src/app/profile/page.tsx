@@ -6,11 +6,11 @@ import { FaLocationDot } from "react-icons/fa6";
 
 export default function Profile() {
   return (
-    <div className=" mx-auto px-10 bg-gray-100">
+    <div className=" mx-auto px-4 md:px-10 bg-gray-100 max-w-full overflow-x-hidden">
 
       {/* Breadcrumb */}
       <div className="text-gray-500 text-sm mt-6">
-        <Link  href="/"  className="text-teal-600 font-semibold hover:underline">
+        <Link href="/"  className="text-teal-600 font-semibold hover:underline">
           الرئيسية
         </Link>{" "}
         / ملف الطبيب
@@ -20,9 +20,9 @@ export default function Profile() {
       <main className="mt-8 grid gap-8">
         <div className="bg-white p-6 rounded-2xl shadow-lg flex max-md:flex-col items-center justify-between gap-6 border border-gray-100">
           
-          <div className="flex items-center gap-6 max-md:flex-col">
+          <div className="flex items-center  gap-6 flex-col md:flex-col">
             {/* Image */}
-            <div className="w-[120px] h-[120px] rounded-full overflow-hidden shadow-md border-4 border-teal-50">
+            <div className="w-[120px] h-[120px] rounded-full overflow-hidden shadow-md border-4  border-teal-50 self-center md:self-start">
               <img src="/n.jpg" className="w-full h-full object-cover" />
             </div>
 
@@ -219,21 +219,21 @@ export default function Profile() {
                   <li className="bg-white border border-gray-100 shadow-sm rounded-xl p-3 flex justify-between items-center text-gray-800">
                     <span className="font-semibold">السبت:</span>
                     <span className="bg-teal-200 text-teal-900 font-bold px-2 py-1 rounded-xl">
-                      12 م – 8 م
+                     8م-12م
                     </span>
                   </li>
 
                   <li className="bg-white border border-gray-100 shadow-sm rounded-xl p-3 flex justify-between items-center text-gray-800">
                     <span className="font-semibold">الأربعاء:</span>
                     <span className="bg-teal-200 text-teal-900 font-bold px-2 py-1 rounded-xl">
-                      12 م – 8 م
+                        8م-12م
                     </span>
                   </li>
 
                   <li className="bg-white border border-gray-100 shadow-sm rounded-xl p-3 flex justify-between items-center text-gray-800">
                     <span className="font-semibold">الخميس:</span>
                     <span className="bg-teal-200 text-teal-900 font-bold px-2 py-1 rounded-xl">
-                      12 م – 8 م
+                        8م-12م
                     </span>
                   </li>
                 </ul>
@@ -270,14 +270,14 @@ export default function Profile() {
                 <li className="bg-white border border-gray-100 shadow-sm rounded-xl p-3 flex justify-between items-center text-gray-800">
                   <span className="font-semibold">الاثنين:</span>
                   <span className="bg-teal-200 text-teal-900 font-bold px-2 py-1 rounded-xl">
-                    12 م – 9 م
+                      9م-12م
                   </span>
                 </li>
 
                 <li className="bg-white border border-gray-100 shadow-sm rounded-xl p-3 flex justify-between items-center text-gray-800">
                   <span className="font-semibold">الثلاثاء:</span>
                   <span className="bg-teal-200 text-teal-900 font-bold px-2 py-1 rounded-xl">
-                    12 م – 9 م
+                    9م-12م
                   </span>
                 </li>
               </ul>
