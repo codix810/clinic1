@@ -13,6 +13,7 @@ export default function Navbar() {
     { href: "/", label: "الرئيسية" },
     { href: "/profile", label: "ملف الطبيب" },
     { href: "/booking", label: "حجز موعد" },
+    { href: "/review", label: "آراء المرضى" },
   ];
 
   return (

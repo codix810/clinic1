@@ -29,61 +29,70 @@ export default function AddPatient() {
 
     const data = await res.json();
     if (data.success) {
-      alert("تم إضافة المريض");
+      alert("تم إضافة المريض بنجاح");
       window.location.href = "/dashboard/patients";
     } else {
-      alert("خطأ — راجع الكونسل");
+      alert("حدث خطأ — راجع الكونسل");
       console.log(data);
     }
   };
 
   return (
-    <div className="p-10 space-y-4">
-      <h1 className="text-2xl font-bold">إضافة مريض جديد</h1>
+    <div className="p-4 md:p-10 max-w-4xl mx-auto">
+     <h1 className="text-3xl font-bold mb-8 text-center  text-gray-800">
+  إضافة مريض جديد
+</h1>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <input
-          placeholder="اسم المريض"
-          className="border p-3 rounded w-full"
-          onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-        />
 
-        <input
-          placeholder="رقم الهاتف"
-          className="border p-3 rounded w-full"
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-        />
+      <form
+        className="bg-white p-6 md:p-8 rounded-2xl shadow-lg space-y-6 border border-gray-100"
+        onSubmit={handleSubmit}
+      >
+        {/* Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <input
+            placeholder="اسم المريض"
+            className="border p-3 rounded-xl w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600 transition"
+            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+          />
 
-        <input
-          type="date"
-          className="border p-3 rounded w-full"
-          onChange={(e) => setForm({ ...form, dob: e.target.value })}
-        />
+          <input
+            placeholder="رقم الهاتف"
+            className="border p-3 rounded-xl w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600 transition"
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          />
 
-        <select
-          className="border p-3 rounded w-full"
-          onChange={(e) => setForm({ ...form, gender: e.target.value })}
-        >
-          <option value="">اختر النوع</option>
-          <option value="ذكر">ذكر</option>
-          <option value="أنثى">أنثى</option>
-        </select>
+          <input
+            type="date"
+            className="border p-3 rounded-xl w-full shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 transition"
+            onChange={(e) => setForm({ ...form, dob: e.target.value })}
+          />
 
-        <input
-          placeholder="العنوان"
-          className="border p-3 rounded w-full"
-          onChange={(e) => setForm({ ...form, address: e.target.value })}
-        />
+          <select
+            className="border p-3 rounded-xl w-full shadow-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 transition"
+            onChange={(e) => setForm({ ...form, gender: e.target.value })}
+          >
+            <option value="">اختر النوع</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+          </select>
+
+          <input
+            placeholder="العنوان"
+            className="border p-3 rounded-xl w-full shadow-sm md:col-span-2 focus:outline-none focus:ring-2 focus:ring-teal-600 transition"
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+          />
+        </div>
 
         <textarea
           placeholder="ملاحظات"
-          className="border p-3 rounded w-full"
+          className="border p-3 rounded-xl w-full h-28 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600 transition"
           onChange={(e) => setForm({ ...form, notes: e.target.value })}
         />
 
         <button
           type="submit"
-          className="bg-teal-600 text-white px-6 py-3 rounded-lg"
+          className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl text-lg font-semibold shadow-md transition cursor-pointer "
         >
           إضافة المريض
         </button>

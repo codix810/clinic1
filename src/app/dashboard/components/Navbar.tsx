@@ -25,13 +25,13 @@ export default function Sidebar() {
     <>
       {/* زر موبايل (Dashboard ↔ X) */}
       <button
-        className="md:hidden fixed top-4 right-4 z-50 bg-white p-3 shadow rounded-lg border transition"
+        className="lg:hidden  fixed top-4 right-4 z-50 bg-white p-3 shadow rounded-lg border transition"
         onClick={() => setOpen(!open)}
       >
         {open ? (
           <X className="w-6 h-6 text-gray-700 transition-transform duration-300 rotate-90" />
         ) : (
-          <LayoutDashboard className="w-6 h-6 text-gray-700 transition-transform duration-300" />
+          <LayoutDashboard className="w-6 h-6  text-gray-700 transition-transform duration-300" />
         )}
       </button>
 
@@ -39,18 +39,18 @@ export default function Sidebar() {
       {open && (
         <div
           onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden "
         />
       )}
 
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 right-0 w-64 h-screen bg-white shadow-xl border-l border-gray-200
+          fixed top-0 right-0 w-64 h-screen bg-white shadow-xl border-l border-gray-200 lg:translate-x-0
           p-5 flex flex-col justify-between z-50
           transform transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "translate-x-full"}
-          md:translate-x-0
+          
         `}
       >
         {/* Profile */}
@@ -67,9 +67,9 @@ export default function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="space-y-2">
+          <nav className="space-y-2 ">
             {links.map((l) => {
-              const active = pathname.startsWith(l.href);
+              const active = pathname ===l.href
 
               return (
                 <Link

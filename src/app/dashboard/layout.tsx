@@ -11,7 +11,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <AdminAuth>
       <div className="min-h-screen flex bg-gray-50">
         <Navbar />
-        <main className="flex-1 p-6 ml-5 mr-60">{children}</main>
+        <main className="mx-auto ">{children}</main>
+        {/* <main className="flex-1 p-6 ml-5 mr-60">{children}</main> */}
       </div>
     </AdminAuth>
   );
