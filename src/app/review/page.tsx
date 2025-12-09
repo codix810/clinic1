@@ -1,8 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
+import dynamic from "next/dynamic";
 import { FaStar } from "react-icons/fa";
-import Rating from "react-rating";
+
+// استيراد المكون بدون SSR
+const Rating = dynamic(
+  () => import('@smastrom/react-rating').then((mod) => mod.Rating),
+  { ssr: false }
+);
+
+import '@smastrom/react-rating/style.css';
+
+
 
 export default function PatientReviews() {
   const [reviews, setReviews] = useState([
@@ -66,12 +76,12 @@ export default function PatientReviews() {
             {/* Rating مع تنسيق أفضل */}
             <div className="flex items-center gap-4">
                 <span className="font-semibold text-gray-700 whitespace-nowrap">تقييم:</span>
-                <Rating
-                initialRating={newRating}
-                emptySymbol={<FaStar className="text-gray-300 text-3xl" />}
-                fullSymbol={<FaStar className="text-yellow-400 text-3xl" />}
-                onChange={(rate) => setNewRating(rate)}
-                />
+              <Rating
+                style={{ maxWidth: 200 }}
+                value={newRating}
+                onChange={(rate: SetStateAction<number>) => setNewRating(rate)}
+              />
+
             </div>
 
             <button
